@@ -1,0 +1,23 @@
+{
+    "name": "hapick/php_practice",
+    "description": "php server practice",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hapick",
+            "email": "136709525532hs@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.4 | ^8.0"
+
+    },
+    "autoload": {
+        "psr-4": {
+            "Src\\": "core/Src/",
+            "": "app/"
+        }
+    }
+}
