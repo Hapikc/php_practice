@@ -6,6 +6,8 @@ return [
     'identity' => \Model\User::class,
     //Классы для middleware
     'routeMiddleware' => [
-        'auth' => \Middlewares\AuthMiddleware::class,
+        'auth' => \Middleware\AuthMiddleware::class,
+        'admin' => \Middleware\AdminMiddleware::class,
+        'adminOrSysadmin' => \Middleware\AdminOrSysadminMiddleware::class
     ]
 ];

@@ -14,3 +14,17 @@ try {
     print_r($exception);
     echo '</pre>';
 }
+
+try {
+    require_once __DIR__ . '/../route/web.php';
+    $app = new Src\Application(new Src\Settings(getConfigs()));
+    $app->run();
+} catch (\Exception $e) {
+    if ($e->getCode() === 403) {
+        http_response_code(403);
+        echo "Доступ запрещен";
+    } else {
+        http_response_code(500);
+        echo "Произошла ошибка: " . $e->getMessage();
+    }
+}

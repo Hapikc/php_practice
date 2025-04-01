@@ -22,14 +22,14 @@ class Request
         return $this->body + $this->files();
     }
 
-    public function set($field, $value):void
+    public function set($field, $value): void
     {
         $this->body[$field] = $value;
     }
 
-    public function get($field)
+    public function get($field, $default = null)
     {
-        return $this->body[$field];
+        return $this->body[$field] ?? $default;
     }
 
     public function files(): array
@@ -39,9 +39,6 @@ class Request
 
     public function __get($key)
     {
-        if (array_key_exists($key, $this->body)) {
-            return $this->body[$key];
-        }
-        throw new Error('Accessing a non-existent property');
+        return $this->get($key);
     }
 }

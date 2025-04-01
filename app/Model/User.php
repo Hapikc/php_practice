@@ -5,17 +5,13 @@ namespace Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Src\Auth\IdentityInterface;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Model implements IdentityInterface
 {
     use HasFactory;
 
     public $timestamps = false;
-    protected $fillable = [
-        'name',
-        'login',
-        'password'
-    ];
 
     protected static function booted()
     {
@@ -43,5 +39,24 @@ class User extends Model implements IdentityInterface
         return self::where(['login' => $credentials['login'],
             'password' => md5($credentials['password'])])->first();
     }
-}
 
+    protected $fillable = [
+        'name', 'sumame', 'patronymic', 'birth_date', 'login', 'password',
+        'department_id', 'role_id'
+    ];
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
+
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function phones()
+    {
+        return $this->hasMany(Phone::class, 'user_id');
+    }
+}
