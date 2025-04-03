@@ -1,5 +1,3 @@
-<?php require __DIR__ . '/../layouts/main.php'; ?>
-
 <div class="container">
     <h1>Редактирование пользователя</h1>
 

@@ -12,7 +12,7 @@ class Room extends Model
     use HasFactory;
     public $timestamps = false;
 
-    protected $primaryKey = 'room_id'; // Указываем кастомный первичный ключ
+    protected $primaryKey = 'room_id';
 
     protected $fillable = [
         'name', 'type', 'department_id'

@@ -11,7 +11,7 @@ class Phone extends Model
     use HasFactory;
     public $timestamps = false;
 
-    protected $primaryKey = 'phone_id'; // Указываем кастомный первичный ключ
+    protected $primaryKey = 'phone_id';
 
     protected $fillable = [
         'number', 'room_id', 'user_id'

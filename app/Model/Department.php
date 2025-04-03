@@ -11,18 +11,23 @@ class Department extends Model
     use HasFactory;
     public $timestamps = false;
 
-    protected $primaryKey = 'department_id'; // Добавьте это
+    protected $primaryKey = 'department_id';
     protected $fillable = [
         'name', 'type'
     ];
+
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class, 'department_id');
+    }
 
     public function rooms(): HasMany
     {
         return $this->hasMany(Room::class, 'department_id');
     }
 
-    public function users(): HasMany
+    public function phones()
     {
-        return $this->hasMany(User::class, 'department_id');
+        return $this->hasManyThrough(Phone::class, Room::class);
     }
 }

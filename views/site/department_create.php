@@ -1,20 +1,24 @@
-<?php require __DIR__ . '/../layouts/main.php'; ?>
+<div class="container-card">
+    <h3 class="mb-4"><?= isset($department) ? 'Редактирование подразделения' : 'Новое подразделение' ?></h3>
 
-<div class="container">
-    <h1>Добавление нового подразделения</h1>
-
-    <form method="POST" action="/departments/store">
-        <div class="mb-3">
-            <label for="name" class="form-label">Название подразделения</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-        </div>
+    <form method="POST" action="<?= isset($department) ? '/departments/update' : '/departments/store' ?>">
+        <?php if (isset($department)): ?>
+            <input type="hidden" name="department_id" value="<?= $department->department_id ?>">
+        <?php endif; ?>
 
         <div class="mb-3">
-            <label for="type" class="form-label">Тип подразделения</label>
-            <input type="text" class="form-control" id="type" name="type" required>
+            <label class="form-label">Название</label>
+            <input type="text" class="form-control" name="name" value="<?= htmlspecialchars($department->name ?? '') ?>" required>
         </div>
 
-        <button type="submit" class="btn btn-primary">Создать</button>
-        <a href="/departments" class="btn btn-secondary">Отмена</a>
+        <div class="mb-4">
+            <label class="form-label">Тип</label>
+            <input type="text" class="form-control" name="type" value="<?= htmlspecialchars($department->type ?? '') ?>" required>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <a href="/departments" class="btn btn-link">Отмена</a>
+        </div>
     </form>
 </div>

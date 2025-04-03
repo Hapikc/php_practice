@@ -59,4 +59,19 @@ class User extends Model implements IdentityInterface
     {
         return $this->hasMany(Phone::class, 'user_id');
     }
+
+    public function isAdmin(): bool
+    {
+        return $this->role_id === 1;
+    }
+
+    public function isSysadmin(): bool
+    {
+        return $this->role_id === 2;
+    }
+
+    public function isAdminOrSysadmin(): bool
+    {
+        return in_array($this->role_id, [1, 2]);
+    }
 }

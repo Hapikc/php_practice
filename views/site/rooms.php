@@ -43,10 +43,10 @@ use Src\Auth\Auth;
                 <td><?= $room->department->name ?></td>
                 <td>
                     <?php if (app()->auth::check() && in_array(app()->auth::user()->role_id, [1, 2])): ?>
-                        <a href="/rooms/edit?room_id=<?= $room->room_id ?>" class="btn btn-sm btn-warning">Редактировать</a>
+                        <a href="/rooms/edit?room_id=<?= $room->room_id ?>" class="btn btn-sm btn-warning">✏️</a>
                         <form action="/rooms/delete" method="POST" style="display: inline-block;">
                             <input type="hidden" name="room_id" value="<?= $room->room_id ?>">
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Вы уверены?')">Удалить</button>
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Вы уверены?')">🗑️</button>
                         </form>
                     <?php endif; ?>
                 </td>

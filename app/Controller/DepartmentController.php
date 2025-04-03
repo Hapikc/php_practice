@@ -15,11 +15,10 @@ class DepartmentController
             app()->route->redirect('/hello');
         }
 
-        $search = $request->get('search') ?? null; // Используем метод get() вместо прямого доступа
+        $search = $request->get('search') ?? null;
         $sort = $request->get('sort') ?? 'name';
         $order = $request->get('order') ?? 'asc';
 
-        // Остальной код остается без изменений
         $departments = Department::query();
 
         if ($search) {

@@ -146,7 +146,6 @@ class UserController
         app()->route->redirect('/users');
     }
 
-    // Простая валидация (можно заменить на более продвинутую)
     private function validate(Request $request, array $rules): array
     {
         $data = $request->all();
@@ -165,17 +164,19 @@ class UserController
                 if ($rule === 'unique:users,login' && User::where('login', $data[$field])->exists()) {
                     $errors[$field][] = "Логин уже занят";
                 }
-
-                // Добавьте другие правила валидации по необходимости
             }
         }
 
         if (!empty($errors)) {
-            // Можно сохранить ошибки в сессию и перенаправить назад
-            // Или выбросить исключение
             throw new \Exception("Validation failed: ".print_r($errors, true));
         }
 
         return $data;
     }
+
+    public function isSysadmin(): bool
+    {
+        return $this->role_id === 2; //
+    }
+
 }
