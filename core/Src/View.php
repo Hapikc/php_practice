@@ -44,22 +44,21 @@ class View
     public function render(string $view = '', array $data = []): string
     {
         $path = $this->getPathToView($view);
+        $mainPath = $this->getPathToMain();
 
-        if (file_exists($this->getPathToMain()) && file_exists($path)) {
-
-            //Импортирует переменные из массива в текущую таблицу символов
-            extract($data, EXTR_PREFIX_SAME, '');
-
-            //Включение буферизации вывода
-            ob_start();
-            require $path;
-            //Помещаем буфер в переменную и очищаем его
-            $content = ob_get_clean();
-
-            //Возвращаем собранную страницу
-            return require($this->getPathToMain());
+        if (!file_exists($mainPath)) {
+            throw new Exception("Main layout not found: $mainPath");
         }
-        throw new Exception('Error render');
+
+        if (!file_exists($path)) {
+            throw new Exception("View not found: $path");
+        }
+
+        extract($data, EXTR_PREFIX_SAME, '');
+        ob_start();
+        require $path;
+        $content = ob_get_clean();
+        return require($mainPath);
     }
 
     public function __toString(): string
