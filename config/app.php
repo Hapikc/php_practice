@@ -9,5 +9,11 @@ return [
         'auth' => \Middleware\AuthMiddleware::class,
         'admin' => \Middleware\AdminMiddleware::class,
         'adminOrSysadmin' => \Middleware\AdminOrSysadminMiddleware::class
+
+    ],
+    'validators' => [
+        'required' => \Validators\RequireValidator::class,
+        'unique' => \Validators\UniqueValidator::class
     ]
+
 ];

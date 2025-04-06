@@ -11,16 +11,7 @@
             <div class="col-md-4">
                 <input type="text" name="search" class="form-control" placeholder="Поиск..." value="<?= htmlspecialchars($search ?? '') ?>">
             </div>
-            <div class="col-md-3">
-                <select name="department_id" class="form-select">
-                    <option value="">Все подразделения</option>
-                    <?php foreach ($departments as $d): ?>
-                        <option value="<?= $d->department_id ?>" <?= $selected_department == $d->department_id ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($d->name) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+
             <div class="col-md-3">
                 <select name="role_id" class="form-select">
                     <option value="">Все роли</option>
@@ -43,7 +34,6 @@
             <tr>
                 <th>ФИО</th>
                 <th>Логин</th>
-                <th>Подразделение</th>
                 <th>Роль</th>
                 <th width="120">Действия</th>
             </tr>
@@ -53,7 +43,6 @@
                 <tr>
                     <td><?= htmlspecialchars($user->surname.' '.$user->name) ?></td>
                     <td><?= htmlspecialchars($user->login) ?></td>
-                    <td><?= htmlspecialchars($user->department->name) ?></td>
                     <td><?= htmlspecialchars($user->role->name) ?></td>
                     <td>
                         <?php if (app()->auth::check() && app()->auth::user()->role_id == 1): ?>

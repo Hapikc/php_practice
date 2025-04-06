@@ -15,10 +15,7 @@ class User extends Model implements IdentityInterface
 
     protected static function booted()
     {
-        static::created(function ($user) {
-            $user->password = md5($user->password);
-            $user->save();
-        });
+
     }
 
     //Выборка пользователя по первичному ключу
@@ -41,14 +38,10 @@ class User extends Model implements IdentityInterface
     }
 
     protected $fillable = [
-        'name', 'sumame', 'patronymic', 'birth_date', 'login', 'password',
-        'department_id', 'role_id'
+        'name', 'surname', 'patronymic', 'birth_date', 'login', 'password',
+         'role_id'
     ];
 
-    public function department(): BelongsTo
-    {
-        return $this->belongsTo(Department::class, 'department_id');
-    }
 
     public function role(): BelongsTo
     {
@@ -73,5 +66,10 @@ class User extends Model implements IdentityInterface
     public function isAdminOrSysadmin(): bool
     {
         return in_array($this->role_id, [1, 2]);
+    }
+
+    public function isRegularUser(): bool
+    {
+        return $this->role_id === 3;
     }
 }

@@ -20,7 +20,6 @@ class UserController
         $search = $request->search ?? null;
         $sort = $request->sort ?? 'surname';
         $order = $request->order ?? 'asc';
-        $department_id = $request->department_id ?? null;
         $role_id = $request->role_id ?? null;
 
         $users = User::query();
@@ -34,25 +33,19 @@ class UserController
             });
         }
 
-        if ($department_id) {
-            $users->where('department_id', $department_id);
-        }
-
         if ($role_id) {
             $users->where('role_id', $role_id);
         }
 
         $users->orderBy($sort, $order)
-            ->with(['department', 'role']);
+            ->with(['role']); // Убрали 'department' из with()
 
         return (new View())->render('site.users', [
             'users' => $users->get(),
-            'departments' => Department::all(),
-            'roles' => Role::all(),
+            'roles' => Role::all(), // Убрали departments из передаваемых данных
             'search' => $search,
             'sort' => $sort,
             'order' => $order,
-            'selected_department' => $department_id,
             'selected_role' => $role_id
         ]);
     }
@@ -65,8 +58,7 @@ class UserController
         }
 
         return (new View())->render('site.user_create', [
-            'departments' => Department::all(),
-            'roles' => Role::all()
+            'roles' => Role::all() // Убрали departments
         ]);
     }
 
@@ -84,7 +76,6 @@ class UserController
             'login' => ['required', 'unique:users,login'],
             'password' => ['required', 'min:6'],
             'role_id' => ['required', 'exists:roles,role_id'],
-            'department_id' => ['required', 'exists:departments,department_id']
         ]);
 
         // Хеширование пароля
@@ -104,7 +95,6 @@ class UserController
         $user = User::find($request->user_id);
         return (new View())->render('site.user_edit', [
             'user' => $user,
-            'departments' => Department::all(),
             'roles' => Role::all()
         ]);
     }
@@ -123,7 +113,7 @@ class UserController
             'name' => ['required'],
             'login' => ['required', 'unique:users,login,'.$user->id],
             'role_id' => ['required', 'exists:roles,role_id'],
-            'department_id' => ['required', 'exists:departments,department_id']
+
         ]);
 
         // Если пароль изменён

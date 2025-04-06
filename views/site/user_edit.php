@@ -39,20 +39,7 @@
             <input type="password" class="form-control" id="password" name="password" minlength="6">
         </div>
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group mb-3">
-                    <label for="department_id">Подразделение:</label>
-                    <select class="form-control" id="department_id" name="department_id" required>
-                        <?php foreach ($departments as $department): ?>
-                            <option value="<?= $department->department_id ?>"
-                                <?= $department->department_id == $user->department_id ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($department->name) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-            </div>
+
             <div class="col-md-6">
                 <div class="form-group mb-3">
                     <label for="role_id">Роль:</label>
