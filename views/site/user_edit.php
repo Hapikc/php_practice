@@ -27,7 +27,20 @@
                 </div>
             </div>
         </div>
+        <div class="form-group mb-3">
+            <label for="avatar">Аватар:</label>
+            <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
 
+            <?php if ($user->avatar): ?>
+                <div class="mt-2">
+                    <img src="<?= $user->avatar ?>" alt="Аватар" style="max-width: 100px; max-height: 100px;">
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" name="remove_avatar" id="remove_avatar">
+                        <label class="form-check-label" for="remove_avatar">Удалить аватар</label>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
         <div class="form-group mb-3">
             <label for="login">Логин:</label>
             <input type="text" class="form-control" id="login" name="login"

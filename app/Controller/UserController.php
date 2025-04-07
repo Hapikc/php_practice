@@ -62,28 +62,6 @@ class UserController
         ]);
     }
 
-    public function store(Request $request): void
-    {
-        // Только для админа
-        if (!Auth::check() || Auth::user()->role_id != 1) {
-            app()->route->redirect('/users');
-        }
-
-        // Валидация данных
-        $validated = $this->validate($request, [
-            'surname' => ['required'],
-            'name' => ['required'],
-            'login' => ['required', 'unique:users,login'],
-            'password' => ['required', 'min:6'],
-            'role_id' => ['required', 'exists:roles,role_id'],
-        ]);
-
-        // Хеширование пароля
-        $validated['password'] = md5($validated['password']);
-
-        User::create($validated);
-        app()->route->redirect('/users');
-    }
 
     public function edit(Request $request): string
     {
@@ -99,43 +77,113 @@ class UserController
         ]);
     }
 
-    public function update(Request $request): void
+
+
+    public function store(Request $request): string
     {
-        // Только для админа
+        if (!Auth::check() || Auth::user()->role_id != 1) {
+            app()->route->redirect('/hello');
+            return ''; // Добавлен явный return
+        }
+
+        try {
+            $validated = $this->validate($request, [
+                'surname' => ['required'],
+                'name' => ['required'],
+                'login' => ['required', 'unique:users,login'],
+                'password' => ['required', 'min:6'],
+                'role_id' => ['required', 'exists:roles,role_id'],
+                'avatar' => ['file'],
+            ]);
+
+            $validated['password'] = md5($validated['password']);
+
+            // Загрузка аватара
+            if ($request->hasFile('avatar')) {
+                $avatarPath = (new User())->uploadAvatar($request);
+                if ($avatarPath) {
+                    $validated['avatar'] = $avatarPath;
+                }
+            }
+
+            User::create($validated);
+            app()->route->redirect('/users');
+            return ''; // Добавлен явный return
+        } catch (\Exception $e) {
+            return (new View())->render('site.error', ['message' => $e->getMessage()]);
+        }
+    }
+
+    public function update(Request $request): string
+    {
+        if (!Auth::check() || Auth::user()->role_id != 1) {
+            app()->route->redirect('/hello');
+            return ''; // Добавлен явный return
+        }
+
+        try {
+            $user = User::find($request->user_id);
+            if (!$user) {
+                throw new \Exception('User not found');
+            }
+
+            $validated = $this->validate($request, [
+                'surname' => ['required'],
+                'name' => ['required'],
+                'login' => ['required', 'unique:users,login,' . $user->id],
+                'role_id' => ['required', 'exists:roles,role_id'],
+                'avatar' => ['file'],
+            ]);
+
+            if (!empty($request->password)) {
+                $validated['password'] = md5($request->password);
+            }
+
+            // Удаление аватара, если отмечено
+            if ($request->remove_avatar && $user->avatar) {
+                $this->deleteAvatarFile($user->avatar);
+                $validated['avatar'] = null;
+            }
+
+            // Загрузка нового аватара
+            if ($request->hasFile('avatar')) {
+                $this->deleteAvatarFile($user->avatar);
+                $avatarPath = $user->uploadAvatar($request);
+                if ($avatarPath) {
+                    $validated['avatar'] = $avatarPath;
+                }
+            }
+
+            $user->update($validated);
+            app()->route->redirect('/users');
+            return ''; // Добавлен явный return
+        } catch (\Exception $e) {
+            return (new View())->render('site.error', ['message' => $e->getMessage()]);
+        }
+    }
+
+    private function deleteAvatarFile(?string $path): void
+    {
+        if ($path && file_exists($_SERVER['DOCUMENT_ROOT'] . $path)) {
+            unlink($_SERVER['DOCUMENT_ROOT'] . $path);
+        }
+    }
+    public function delete(Request $request): void
+    {
         if (!Auth::check() || Auth::user()->role_id != 1) {
             app()->route->redirect('/users');
         }
 
         $user = User::find($request->user_id);
 
-        $validated = $this->validate($request, [
-            'surname' => ['required'],
-            'name' => ['required'],
-            'login' => ['required', 'unique:users,login,'.$user->id],
-            'role_id' => ['required', 'exists:roles,role_id'],
-
-        ]);
-
-        // Если пароль изменён
-        if (!empty($request->password)) {
-            $validated['password'] = md5($request->password);
+        // Удаляем аватар, если он есть
+        if ($user->avatar && file_exists($_SERVER['DOCUMENT_ROOT'] . $user->avatar)) {
+            unlink($_SERVER['DOCUMENT_ROOT'] . $user->avatar);
         }
 
-        $user->update($validated);
+        $user->delete();
         app()->route->redirect('/users');
     }
-
-    public function delete(Request $request): void
-    {
-        // Только для админа
-        if (!Auth::check() || Auth::user()->role_id != 1) {
-            app()->route->redirect('/users');
-        }
-
-        User::find($request->user_id)->delete();
-        app()->route->redirect('/users');
-    }
-
     private function validate(Request $request, array $rules): array
     {
         $data = $request->all();
@@ -153,6 +201,19 @@ class UserController
 
                 if ($rule === 'unique:users,login' && User::where('login', $data[$field])->exists()) {
                     $errors[$field][] = "Логин уже занят";
+                }
+
+                // Перенесено внутрь цикла
+                if ($rule === 'file' && $request->hasFile($field)) {
+                    $file = $request->file($field);
+                    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                    if (!in_array($file['type'], $allowedTypes)) {
+                        $errors[$field][] = "Недопустимый тип файла. Разрешены только JPEG, PNG и GIF";
+                    }
+
+                    if ($file['size'] > 2 * 1024 * 1024) { // 2MB
+                        $errors[$field][] = "Файл слишком большой. Максимальный размер 2MB";
+                    }
                 }
             }
         }

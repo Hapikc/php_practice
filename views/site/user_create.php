@@ -22,7 +22,10 @@
                     </div>
                 </div>
             </div>
-
+            <div class="form-group mb-3">
+                <label for="avatar">Аватар:</label>
+                <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+            </div>
             <div class="form-group mb-3">
                 <label for="login">Логин:</label>
                 <input type="text" class="form-control" id="login" name="login" required>

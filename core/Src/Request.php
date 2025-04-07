@@ -2,24 +2,24 @@
 
 namespace Src;
 
-use Error;
-
 class Request
 {
     protected array $body;
+    protected array $files;
     public string $method;
     public array $headers;
 
     public function __construct()
     {
-        $this->body = $_REQUEST;
+        $this->body = $_POST;
+        $this->files = $_FILES;
         $this->method = $_SERVER['REQUEST_METHOD'];
         $this->headers = getallheaders() ?? [];
     }
 
     public function all(): array
     {
-        return $this->body + $this->files();
+        return $this->body + $this->files;
     }
 
     public function set($field, $value): void
@@ -34,7 +34,19 @@ class Request
 
     public function files(): array
     {
-        return $_FILES;
+        return $this->files;
+    }
+
+    // Новые методы для работы с файлами
+    public function hasFile(string $name): bool
+    {
+        return isset($this->files[$name]) &&
+            $this->files[$name]['error'] !== UPLOAD_ERR_NO_FILE;
+    }
+
+    public function file(string $name): ?array
+    {
+        return $this->files[$name] ?? null;
     }
 
     public function __get($key)

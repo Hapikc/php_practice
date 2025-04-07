@@ -8,7 +8,11 @@ return [
     'routeMiddleware' => [
         'auth' => \Middleware\AuthMiddleware::class,
         'admin' => \Middleware\AdminMiddleware::class,
-        'adminOrSysadmin' => \Middleware\AdminOrSysadminMiddleware::class
+        'adminOrSysadmin' => \Middleware\AdminOrSysadminMiddleware::class,
+        'csrf' => \Middleware\CSRFMiddleware::class,
+        'trim' => \Middleware\TrimMiddleware::class,
+        'specialChars' => \Middleware\SpecialCharsMiddleware::class,
+
 
     ],
     'validators' => [

@@ -39,8 +39,51 @@ class User extends Model implements IdentityInterface
 
     protected $fillable = [
         'name', 'surname', 'patronymic', 'birth_date', 'login', 'password',
-         'role_id'
+        'role_id', 'avatar' // Добавлено avatar
     ];
+
+    // Метод для загрузки аватара
+    // Model/User.php
+
+    public function uploadAvatar(Request $request): ?string
+    {
+        if (!$request->hasFile('avatar')) {
+            return null;
+        }
+
+        $file = $request->file('avatar');
+
+        // Проверка ошибки загрузки
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            return null;
+        }
+
+        // Проверка типа файла
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!in_array($file['type'], $allowedTypes)) {
+            return null;
+        }
+
+        // Генерация уникального имени файла
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $filename = uniqid('avatar_') . '.' . $extension;
+
+        // Путь для сохранения
+        $path = 'uploads/avatars';
+        $fullPath = $_SERVER['DOCUMENT_ROOT'] . "/public/{$path}";
+
+        // Создание директории, если её нет
+        if (!is_dir($fullPath)) {
+            mkdir($fullPath, 0755, true);
+        }
+
+        // Перемещение файла
+        if (move_uploaded_file($file['tmp_name'], $fullPath . '/' . $filename)) {
+            return "/{$path}/{$filename}";
+        }
+
+        return null;
+    }
 
 
     public function role(): BelongsTo

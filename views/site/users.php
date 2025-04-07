@@ -32,6 +32,7 @@
         <table class="table table-custom table-hover">
             <thead>
             <tr>
+                <th>Аватар</th>
                 <th>ФИО</th>
                 <th>Логин</th>
                 <th>Роль</th>
@@ -41,6 +42,13 @@
             <tbody>
             <?php foreach ($users as $user): ?>
                 <tr>
+                    <td>
+                        <?php if ($user->avatar): ?>
+                            <img src="<?= $user->avatar ?>" alt="Аватар" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        <?php else: ?>
+                            <div style="width: 40px; height: 40px; background: #eee; border-radius: 50%;"></div>
+                        <?php endif; ?>
+                    </td>
                     <td><?= htmlspecialchars($user->surname.' '.$user->name) ?></td>
                     <td><?= htmlspecialchars($user->login) ?></td>
                     <td><?= htmlspecialchars($user->role->name) ?></td>
@@ -56,6 +64,7 @@
                 </tr>
             <?php endforeach; ?>
             </tbody>
+
         </table>
     </div>
 </div>
