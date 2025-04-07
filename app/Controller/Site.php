@@ -4,19 +4,81 @@ namespace Controller;
 
 use Model\Post;
 use Src\View;
+use Src\Request;
+use Model\User;
+use Src\Auth\Auth;
+use Src\Validator\Validator;
 
 class Site
 {
-    public function index(): string
+    public function index(Request $request): string
     {
-        $posts = Post::all();
+        $posts = Post::where('id', $request->id)->get();
         return (new View())->render('site.post', ['posts' => $posts]);
     }
 
+
     public function hello(): string
     {
-        return new View('site.hello', ['message' => 'hello working']);
+        return (string)(new View('site.hello', ['message' => 'hello working']));
     }
-}
 
-// test commit
+    public function signup(Request $request): string
+    {
+        if ($request->method === 'POST') {
+            $validator = new Validator($request->all(), [
+                'name' => ['required'],
+                'login' => ['required', 'unique:users,login'],
+                'password' => ['required']
+            ], [
+                'required' => 'Поле :field пусто',
+                'unique' => 'Поле :field должно быть уникально'
+            ]);
+
+            if($validator->fails()){
+                return new View('site.signup',
+                    ['message' => json_encode($validator->errors(), JSON_UNESCAPED_UNICODE)]);
+            }
+
+            $userData = $request->all();
+            $userData['role_id'] = 3; // ID для обычного пользователя
+            $userData['password'] = md5($userData['password']); // Используем md5 как везде в проекте
+
+            if (User::create($userData)) {
+                // Автоматически авторизуем пользователя после регистрации
+                Auth::attempt([
+                    'login' => $userData['login'],
+                    'password' => $request->password // исходный пароль (до хеширования)
+                ]);
+
+                app()->route->redirect('/hello'); // Перенаправляем на главную
+                return ''; // Пустая строка, так как будет редирект
+            }
+        }
+        return new View('site.signup');
+    }
+    public function login(Request $request): string
+    {
+        if ($request->method === 'GET') {
+            return new View('site.login');
+        }
+
+        if (Auth::attempt($request->all())) {
+            $user = Auth::user();
+
+            // Разрешаем вход для всех ролей (1, 2, 3)
+            app()->route->redirect('/hello');
+            return '';
+        }
+
+        return new View('site.login', ['message' => 'Неправильные логин или пароль']);
+    }
+
+    public function logout(): void
+    {
+        Auth::logout();
+        app()->route->redirect('/hello');
+    }
+
+
+}
