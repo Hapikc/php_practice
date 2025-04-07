@@ -1,8 +1,0 @@
-<?php
-
-use Src\Route;
-
-Route::add('hello', [Controller\Site::class, 'hello']);
-Route::add('signup', [Controller\Site::class, 'signup']);
-Route::add('login', [Controller\Site::class, 'login']);
-Route::add('logout', [Controller\Site::class, 'logout']);
