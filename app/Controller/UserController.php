@@ -3,11 +3,11 @@
 namespace Controller;
 
 use Model\User;
-use Model\Department;
 use Model\Role;
 use Src\Request;
 use Src\View;
 use Src\Auth\Auth;
+use Src\Validator\UserValidator;
 
 class UserController
 {
@@ -83,22 +83,14 @@ class UserController
     {
         if (!Auth::check() || Auth::user()->role_id != 1) {
             app()->route->redirect('/hello');
-            return ''; // Добавлен явный return
         }
 
         try {
-            $validated = $this->validate($request, [
-                'surname' => ['required'],
-                'name' => ['required'],
-                'login' => ['required', 'unique:users,login'],
-                'password' => ['required', 'min:6'],
-                'role_id' => ['required', 'exists:roles,role_id'],
-                'avatar' => ['file'],
-            ]);
+            $validator = new UserValidator();
+            $validated = $validator->validate($request);
 
             $validated['password'] = md5($validated['password']);
 
-            // Загрузка аватара
             if ($request->hasFile('avatar')) {
                 $avatarPath = (new User())->uploadAvatar($request);
                 if ($avatarPath) {
@@ -108,57 +100,76 @@ class UserController
 
             User::create($validated);
             app()->route->redirect('/users');
-            return ''; // Добавлен явный return
+            return '';
+        } catch (\InvalidArgumentException $e) {
+            $request->errors = json_decode($e->getMessage(), true);
+            return $this->create($request);
         } catch (\Exception $e) {
-            return (new View())->render('site.error', ['message' => $e->getMessage()]);
+            $request->errors = ['Ошибка при создании пользователя'];
+            return $this->create($request);
         }
     }
 
     public function update(Request $request): string
     {
+        // Проверка прав доступа (только для администратора)
         if (!Auth::check() || Auth::user()->role_id != 1) {
             app()->route->redirect('/hello');
-            return ''; // Добавлен явный return
+            return '';
         }
 
         try {
+            // Создаем экземпляр валидатора
+            $validator = new UserValidator();
+
+            // Валидируем данные с флагом isUpdate = true
+            $validated = $validator->validate($request, true);
+
+            // Находим пользователя для обновления
             $user = User::find($request->user_id);
             if (!$user) {
-                throw new \Exception('User not found');
+                throw new \Exception('Пользователь не найден');
             }
 
-            $validated = $this->validate($request, [
-                'surname' => ['required'],
-                'name' => ['required'],
-                'login' => ['required', 'unique:users,login,' . $user->id],
-                'role_id' => ['required', 'exists:roles,role_id'],
-                'avatar' => ['file'],
-            ]);
-
+            // Хешируем пароль, если он был изменен
             if (!empty($request->password)) {
                 $validated['password'] = md5($request->password);
             }
 
-            // Удаление аватара, если отмечено
+            // Обработка аватара - удаление старого
             if ($request->remove_avatar && $user->avatar) {
                 $this->deleteAvatarFile($user->avatar);
                 $validated['avatar'] = null;
             }
 
-            // Загрузка нового аватара
+            // Обработка аватара - загрузка нового
             if ($request->hasFile('avatar')) {
+                // Удаляем старый аватар
                 $this->deleteAvatarFile($user->avatar);
+
+                // Загружаем новый
                 $avatarPath = $user->uploadAvatar($request);
                 if ($avatarPath) {
                     $validated['avatar'] = $avatarPath;
                 }
             }
 
+            // Обновляем данные пользователя
             $user->update($validated);
+
+            // Перенаправляем после успешного обновления
             app()->route->redirect('/users');
-            return ''; // Добавлен явный return
+            return '';
+
+        } catch (\InvalidArgumentException $e) {
+            // Обработка ошибок валидации
+            $request->errors = json_decode($e->getMessage(), true);
+            return $this->edit($request);
+
         } catch (\Exception $e) {
-            return (new View())->render('site.error', ['message' => $e->getMessage()]);
+            // Обработка других ошибок
+            $request->errors = ['Ошибка при обновлении пользователя: ' . $e->getMessage()];
+            return $this->edit($request);
         }
     }
 
