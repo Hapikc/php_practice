@@ -10,6 +10,7 @@ use Model\Role;
 use Src\Request;
 use Src\View;
 use Src\Auth\Auth;
+use Hapick\Collect\Collect;
 
 class PhoneController
 {
@@ -45,30 +46,25 @@ class PhoneController
         app()->route->redirect('/phones');
     }
 
-    public function byDepartment(Request $request): string
+    public function byDepartment(Request $request)
     {
-        if (!Auth::check() || !in_array(Auth::user()->role_id, [1, 2])) {
-            app()->route->redirect('/hello');
-        }
+        $phones = Phone::with('department')->get()->toArray();
 
-        // Используем метод get() для получения параметра
-        $departmentId = $request->get('department_id');
+        $result = (new Collect($phones))
+            ->filter(function($phone) use ($request) {
+                return $phone['department_id'] == $request->department_id;
+            })
+            ->map(function($phone) {
+                return [
+                    'id' => $phone['id'],
+                    'number' => format_phone($phone['number']),
+                    'user' => $phone['user']['name'] ?? 'N/A'
+                ];
+            })
+            ->sortBy('user')
+            ->toArray();
 
-        if (!$departmentId) {
-            // Обработка случая, когда параметр не передан
-            return (new View())->render('site.phones', [
-                'phones' => [],
-                'error' => 'Не указано подразделение'
-            ]);
-        }
-
-        $phones = Phone::whereHas('user', function($query) use ($departmentId) {
-            $query->where('department_id', $departmentId);
-        })->get();
-
-        return (new View())->render('site.phones', [
-            'phones' => $phones
-        ]);
+        return view('phones', ['phones' => $result]);
     }
 
     public function byRoom(Request $request): string
