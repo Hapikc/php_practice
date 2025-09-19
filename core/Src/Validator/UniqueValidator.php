@@ -1,18 +1,29 @@
 <?php
 
-namespace Validators;
+namespace Src\Validator;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
-use Src\Validator\AbstractValidator;
 
 class UniqueValidator extends AbstractValidator
 {
-
-    protected string $message = 'Field :field must be unique';
+    protected string $message = 'Значение поля :field уже существует';
 
     public function rule(): bool
     {
-        return (bool)!Capsule::table($this->args[0])
-            ->where($this->args[1], $this->value)->count();
+        if (empty($this->value)) {
+            return true;
+        }
+
+        $table = $this->args[0] ?? '';
+        $column = $this->args[1] ?? $this->field;
+        $ignoreId = $this->args[2] ?? null;
+
+        $query = Capsule::table($table)->where($column, $this->value);
+
+        if ($ignoreId) {
+            $query->where('id', '!=', $ignoreId);
+        }
+
+        return $query->count() === 0;
     }
 }

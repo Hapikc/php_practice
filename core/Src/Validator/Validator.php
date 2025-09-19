@@ -4,73 +4,103 @@ namespace Src\Validator;
 
 class Validator
 {
-    //Разрешенные валидаторы
     private array $validators = [];
-    //Итоговые ошибки
     private array $errors = [];
-    //Проверяемые поля
     private array $fields = [];
-    //Массив правил
     private array $rules = [];
-    //Кастомные сообщения
     private array $messages = [];
 
     public function __construct(array $fields, array $rules, array $messages = [])
     {
-        $this->validators = app()->settings->app['validators'] ?? [];
+        $this->validators = $this->getDefaultValidators();
         $this->fields = $fields;
         $this->rules = $rules;
         $this->messages = $messages;
         $this->validate();
     }
 
-    //Перебираем список всех валидируемых полей и для
-    //каждого поля вызываем метод validateField()
+    private function getDefaultValidators(): array
+    {
+        return [
+            'required' => \Src\Validator\RequiredValidator::class,
+            'min' => \Src\Validator\MinValidator::class,
+            'unique' => \Src\Validator\UniqueValidator::class,
+            'exists' => \Src\Validator\ExistsValidator::class,
+            'email' => \Src\Validator\EmailValidator::class,
+            'numeric' => \Src\Validator\NumericValidator::class,
+        ];
+    }
+
     private function validate(): void
     {
         foreach ($this->rules as $fieldName => $fieldValidators) {
+            if (!array_key_exists($fieldName, $this->fields)) {
+                $this->fields[$fieldName] = null;
+            }
+
             $this->validateField($fieldName, $fieldValidators);
         }
     }
 
-    //Валидация отдельного поля
     private function validateField(string $fieldName, array $fieldValidators): void
     {
-        //Перебираем все валидаторы, ассоциированные с полем
-        foreach ($fieldValidators as $validatorName) {
-            //Отделяем от имени валидатора дополнительные аргументы
-            $tmp = explode(':', $validatorName);
-            [$validatorName, $args] = count($tmp) > 1 ? $tmp : [$validatorName, null];
-            $args = isset($args) ? explode(',', $args) : [];
+        foreach ($fieldValidators as $validator) {
+            $validatorParts = explode(':', $validator, 2);
+            $validatorName = $validatorParts[0];
+            $params = isset($validatorParts[1]) ? explode(',', $validatorParts[1]) : [];
 
-            //Соотносим имя валидатора с классом в массиве разрешенных валидаторов
+            if (!isset($this->validators[$validatorName])) {
+                continue;
+            }
+
             $validatorClass = $this->validators[$validatorName];
+
             if (!class_exists($validatorClass)) {
                 continue;
             }
-            //Создаем объект валидатора, передаем туда параметры
-            $validator = new $validatorClass(
-                $fieldName,
-                $this->fields[$fieldName],
-                $args,
-                $this->messages[$validatorName]);
 
-            //Если валидация не прошла, то добавляем ошибку в общий массив ошибок
-            if (!$validator->rule()) {
-                $this->errors[$fieldName][] = $validator->validate();
+            $validatorInstance = new $validatorClass(
+                $fieldName,
+                $this->fields[$fieldName] ?? null,
+                $params,
+                $this->messages
+            );
+
+            $error = $validatorInstance->validate();
+            if (!empty($error)) {
+                $this->errors[$fieldName][] = $error;
             }
         }
     }
 
-    //Возврат массива найденных ошибок
     public function errors(): array
     {
         return $this->errors;
     }
 
-    //Признак успешной валидации
     public function fails(): bool
     {
-        return (bool)count($this->errors);
+        return count($this->errors) > 0;
+    }
+
+    public function getFirstError(): ?string
+    {
+        foreach ($this->errors as $errors) {
+            if (!empty($errors)) {
+                return $errors[0];
+            }
+        }
+        return null;
+    }
+
+    public function getErrorsFlat(): array
+    {
+        $flatErrors = [];
+        foreach ($this->errors as $errors) {
+            foreach ($errors as $error) {
+                $flatErrors[] = $error;
+            }
+        }
+        return $flatErrors;
     }
 }

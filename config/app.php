@@ -12,8 +12,12 @@ return [
 
     ],
     'validators' => [
-        'required' => \Validators\RequireValidator::class,
-        'unique' => \Validators\UniqueValidator::class
+        'required' => \Src\Validator\RequiredValidator::class,
+        'min' => \Src\Validator\MinValidator::class,
+        'unique' => \Src\Validator\UniqueValidator::class,
+        'exists' => \Src\Validator\ExistsValidator::class,
+        'email' => \Src\Validator\EmailValidator::class,
+        'numeric' => \Src\Validator\NumericValidator::class,
     ]
 
 ];

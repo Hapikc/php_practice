@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Internal Phone System</title>
-    <link href="/php_practice/public/css/main.css" rel="stylesheet">
+    <link href="/public/css/main.css" rel="stylesheet">
     <style>
         a {
             text-decoration: none;

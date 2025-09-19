@@ -7,6 +7,7 @@ use Model\Role;
 use Src\Request;
 use Src\View;
 use Src\Auth\Auth;
+use Src\Validator\Validator;
 
 class UserController
 {
@@ -154,9 +155,17 @@ class UserController
             }
 
             if (!empty($request->password)) {
-                if (strlen($request->password) < 6) {
-                    throw new \Exception("Пароль должен быть не менее 6 символов");
+                // Валидация пароля
+                $passwordValidator = new Validator(
+                    ['password' => $request->password],
+                    ['password' => ['min:6']],
+                    ['min' => 'Пароль должен содержать не менее :arg0 символов']
+                );
+
+                if ($passwordValidator->fails()) {
+                    throw new \Exception($passwordValidator->getFirstError());
                 }
+
                 $validated['password'] = md5($request->password);
             }
 
@@ -175,6 +184,7 @@ class UserController
         }
     }
 
+
     public function delete(Request $request): void
     {
         if (!Auth::check() || Auth::user()->role_id != 1) {
@@ -188,36 +198,18 @@ class UserController
     private function validate(Request $request, array $rules): array
     {
         $data = $request->all();
-        $errors = [];
 
-        foreach ($rules as $field => $fieldRules) {
-            foreach ($fieldRules as $rule) {
-                if ($rule === 'required' && empty($data[$field])) {
-                    $errors[$field][] = "Поле обязательно для заполнения";
-                }
+        $validator = new Validator($data, $rules, [
+            'required' => 'Поле :field обязательно для заполнения',
+            'min' => 'Поле :field должно содержать не менее :arg0 символов',
+            'unique' => 'Значение поля :field уже существует',
+            'exists' => 'Указанное значение в поле :field не существует',
+            'email' => 'Поле :field должно содержать корректный email адрес',
+            'numeric' => 'Поле :field должно быть числом'
+        ]);
 
-                if (strpos($rule, 'min:') === 0 && isset($data[$field]) && strlen($data[$field]) < substr($rule, 4)) {
-                    $errors[$field][] = "Минимальная длина ".substr($rule, 4);
-                }
-
-                if ($rule === 'unique:users,login' && User::where('login', $data[$field])->exists()) {
-                    $errors[$field][] = "Логин уже занят";
-                }
-
-                if ($rule === 'exists:roles,role_id' && !Role::where('role_id', $data[$field])->exists()) {
-                    $errors[$field][] = "Указанная роль не существует";
-                }
-            }
-        }
-
-        if (!empty($errors)) {
-            $errorMessages = [];
-            foreach ($errors as $field => $fieldErrors) {
-                foreach ($fieldErrors as $error) {
-                    $errorMessages[] = "$field: $error";
-                }
-            }
-            throw new \Exception(implode(", ", $errorMessages));
+        if ($validator->fails()) {
+            throw new \Exception(implode(", ", $validator->getErrorsFlat()));
         }
 
         return $data;

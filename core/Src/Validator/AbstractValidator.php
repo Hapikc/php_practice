@@ -4,47 +4,61 @@ namespace Src\Validator;
 
 abstract class AbstractValidator
 {
-    //Наименование валидируемого поля
     protected string $field = '';
-    //Значение валидируемого поля
     protected $value;
-    //Дополнительные аргументы
     protected array $args = [];
-    //Массив ключей для замены в строке с ошибкой
     protected array $messageKeys = [];
-    //Базовое сообщение об ошибке
     protected string $message = '';
+    protected array $customMessages = [];
 
-    public function __construct(string $fieldName, $value, $args = [], string $message = null)
+    public function __construct(string $fieldName, $value, $args = [], array $customMessages = [])
     {
         $this->field = $fieldName;
         $this->value = $value;
         $this->args = $args;
-        $this->message = $message ?? $this->message;
+        $this->customMessages = $customMessages;
 
         $this->messageKeys = [
             ":value" => $this->value,
             ":field" => $this->field
         ];
+
+        // Добавляем параметры в messageKeys
+        foreach ($args as $index => $arg) {
+            $this->messageKeys[":arg$index"] = $arg;
+        }
     }
 
-    //Если правило валидации не прошло, то возвращаем сообщение об ошибке
-    public function validate()
+    public function validate(): string
     {
-        if (!$this->rule())
+        if (!$this->rule()) {
             return $this->messageError();
-        return true;
+        }
+        return '';
     }
 
-    //Замена ключей на конкретные значения в сообщении об ошибке
     private function messageError(): string
     {
+        $message = $this->getMessage();
+
         foreach ($this->messageKeys as $key => $value) {
-            $message = str_replace($key, (string)$value, $this->message);
+            $message = str_replace($key, (string)$value, $message);
         }
+
         return $message;
     }
 
-    //Основное правило валидации. Его должны переопределить классы-потомки
+    protected function getMessage(): string
+    {
+        $validatorName = $this->getValidatorName();
+        return $this->customMessages[$validatorName] ?? $this->message;
+    }
+
+    protected function getValidatorName(): string
+    {
+        $class = get_class($this);
+        return strtolower(substr($class, strrpos($class, '\\') + 1, -10));
+    }
+
     abstract public function rule(): bool;
 }
