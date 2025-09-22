@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "617a2fdcfeb48bd028324eb039fd44af",
+    "content-hash": "7ef8553c575373d305f8df56f78849a6",
     "packages": [
         {
             "name": "brick/math",
@@ -224,6 +224,49 @@
                 }
             ],
             "time": "2025-08-10T19:31:58+00:00"
+        },
+        {
+            "name": "hapikc/collect_practice",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Hapikc/collect-php.git",
+                "reference": "53445c12d453b86ddfe5065270164410d1271191"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Hapikc/collect-php/zipball/53445c12d453b86ddfe5065270164410d1271191",
+                "reference": "53445c12d453b86ddfe5065270164410d1271191",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Collect\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hapikc",
+                    "email": "136709525532hs@gmail.com"
+                }
+            ],
+            "support": {
+                "issues": "https://github.com/Hapikc/collect-php/issues",
+                "source": "https://github.com/Hapikc/collect-php/tree/main"
+            },
+            "time": "2025-05-14T14:33:04+00:00"
         },
         {
             "name": "illuminate/bus",
@@ -1655,7 +1698,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "hapikc/collect_practice": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

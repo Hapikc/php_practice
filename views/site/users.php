@@ -1,9 +1,16 @@
 <div class="container-card">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h4 mb-0">Пользователи</h2>
-        <?php if (app()->auth::check() && app()->auth::user()->role_id == 1): ?>
+        <?php if (app()->auth::check() && in_array(app()->auth::user()->role_id, [1, 2])): ?>
             <a href="/users/create" class="btn btn-primary btn-sm">+ Добавить</a>
         <?php endif; ?>
+        <!-- Статистика через Collect -->
+        <?php if (isset($stats)): ?>
+            <div class="badge bg-info">
+                Всего: <?= $stats['total'] ?> | Админы: <?= $stats['admins'] ?>
+            </div>
+        <?php endif; ?>
+    </div>
     </div>
 
     <div class="mb-4">

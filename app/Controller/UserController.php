@@ -8,6 +8,7 @@ use Src\Request;
 use Src\View;
 use Src\Auth\Auth;
 use Src\Validator\Validator;
+use Collect\Collect;
 
 class UserController
 {
@@ -35,18 +36,44 @@ class UserController
         }
 
         $users->with(['role']);
+        $userData = $users->get();
+
+        // Использование Collect для работы с данными
+        $userCollection = new Collect($userData->toArray());
+
+        // Примеры использования Collect:
+
+        // Группировка пользователей по ролям
+        $usersByRole = $userCollection->groupBy('role_id');
+
+        // Получение списка логинов
+        $logins = $userCollection->pluck('login');
+
+        // Фильтрация администраторов
+        $admins = $userCollection->filter(function($user) {
+            return $user['role_id'] == 1;
+        });
+
+        // Статистика
+        $userCount = $userCollection->count();
+        $adminCount = $admins->count();
 
         return (new View())->render('site.users', [
-            'users' => $users->get(),
+            'users' => $userData,
             'roles' => Role::all(),
             'search' => $search,
-            'selected_role' => $role_id
+            'selected_role' => $role_id,
+            'userCollection' => $userCollection,
+            'stats' => [
+                'total' => $userCount,
+                'admins' => $adminCount
+            ]
         ]);
     }
 
     public function create(Request $request): string
     {
-        if (!Auth::check() || Auth::user()->role_id != 1) {
+        if (!Auth::check() || !in_array(Auth::user()->role_id, [1, 2])) {
             app()->route->redirect('/users');
         }
 
@@ -57,7 +84,7 @@ class UserController
 
     public function store(Request $request)
     {
-        if (!Auth::check() || Auth::user()->role_id != 1) {
+        if (!Auth::check() || !in_array(Auth::user()->role_id, [1, 2])) {
             app()->route->redirect('/users');
         }
 
@@ -94,7 +121,7 @@ class UserController
 
     public function edit(Request $request): string
     {
-        if (!Auth::check() || Auth::user()->role_id != 1) {
+        if (!Auth::check() || !in_array(Auth::user()->role_id, [1, 2])) {
             app()->route->redirect('/users');
         }
 

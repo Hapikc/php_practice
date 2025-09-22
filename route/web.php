@@ -4,7 +4,7 @@ use Src\Route;
 
 // Основные маршруты
 Route::add('GET', '/', [Controller\Site::class, 'hello'])
-    ->middleware('auth');
+   ->middleware('auth');
 Route::add('GET', '/hello', [Controller\Site::class, 'hello'])
     ->middleware('auth');
 Route::add(['GET', 'POST'], '/signup', [Controller\Site::class, 'signup']);
@@ -61,13 +61,13 @@ Route::add('POST', '/departments/delete', [Controller\DepartmentController::clas
 Route::add('GET', '/users', [Controller\UserController::class, 'index'])
     ->middleware('auth', 'adminOrSysadmin');
 Route::add(['GET', 'POST'], '/users/create', [Controller\UserController::class, 'create'])
-    ->middleware('auth', 'admin');
+    ->middleware('auth', 'adminOrSysadmin');
 Route::add('POST', '/users/store', [Controller\UserController::class, 'store'])
-    ->middleware('auth', 'admin');
+    ->middleware('auth', 'adminOrSysadmin');
 Route::add(['GET', 'POST'], '/users/edit', [Controller\UserController::class, 'edit'])
     ->middleware('auth', 'admin');
 Route::add('POST', '/users/update', [Controller\UserController::class, 'update'])
-    ->middleware('auth', 'admin');
+    ->middleware('auth', 'admin', 'adminOrSysadmin');
 Route::add('POST', '/users/delete', [Controller\UserController::class, 'delete'])
     ->middleware('auth', 'admin');
 Route::add('POST', '/users/delete-avatar', [Controller\UserController::class, 'deleteAvatarAction'])
