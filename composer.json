@@ -15,12 +15,14 @@
         "illuminate/database": "^10.48",
         "illuminate/events": "^10.48",
         "nikic/fast-route": "^2.0",
-        "hapikc/collect_practice": "dev-main"
+        "hapikc/collect_practice": "dev-main",
+        "hapick/middleware": "dev-main"
     },
     "autoload": {
         "psr-4": {
             "Src\\": "core/Src/",
-            "": "app/"
+            "": "app/",
+            "Middleware\\": "core/Middleware/"
         }
     }
 }

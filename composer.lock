@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7ef8553c575373d305f8df56f78849a6",
+    "content-hash": "c56fae3c4e6dac001ca377da5ae68792",
     "packages": [
         {
             "name": "brick/math",
@@ -224,6 +224,54 @@
                 }
             ],
             "time": "2025-08-10T19:31:58+00:00"
+        },
+        {
+            "name": "hapick/middleware",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Hapikc/Middleware.git",
+                "reference": "f5db519401018f39adfe411ef7f7cd8fcda87737"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Hapikc/Middleware/zipball/f5db519401018f39adfe411ef7f7cd8fcda87737",
+                "reference": "f5db519401018f39adfe411ef7f7cd8fcda87737",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Hapick\\Middleware\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hapick",
+                    "email": "136709525532hs@gmail.com"
+                }
+            ],
+            "description": "individual task",
+            "keywords": [
+                "Authentication",
+                "auth",
+                "middleware",
+                "php",
+                "routing"
+            ],
+            "support": {
+                "issues": "https://github.com/Hapikc/Middleware/issues",
+                "source": "https://github.com/Hapikc/Middleware/tree/main"
+            },
+            "time": "2025-09-22T21:25:09+00:00"
         },
         {
             "name": "hapikc/collect_practice",
@@ -1699,6 +1747,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "hapick/middleware": 20,
         "hapikc/collect_practice": 20
     },
     "prefer-stable": false,
