@@ -245,7 +245,20 @@ class UserController
     private function uploadAvatar(array $file): ?string
     {
         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/public/uploads/avatars/';
-
+        $imgDir = $_SERVER['DOCUMENT_ROOT'] . '/public/img/';
+        // создание папок, если их нет
+        if (!file_exists($uploadDir)) {
+            if (!mkdir($uploadDir, 0755, true)) {
+                throw new \Exception("Не удалось создать папку для загрузки файлов");
+            }
+        }
+        
+        if (!file_exists($imgDir)) {
+            if (!mkdir($imgDir, 0755, true)) {
+                throw new \Exception("Не удалось создать папку для изображений");
+            }
+        }
+        
         // Проверяем тип файла
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
         if (!in_array($file['type'], $allowedTypes)) {
