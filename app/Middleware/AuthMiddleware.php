@@ -2,18 +2,16 @@
 
 namespace Middleware;
 
-use Hapick\Middleware\AuthMiddleware as BaseAuthMiddleware;
 use Src\Auth\Auth;
+use Src\Request;
 
-class AuthMiddleware extends BaseAuthMiddleware
+class AuthMiddleware
 {
-    protected function authCheck(): bool
+    public function handle(Request $request)
     {
-        return Auth::check();
-    }
 
-    protected function redirect(string $url)
-    {
-        app()->route->redirect($url);
+        if (!Auth::check()) {
+            app()->route->redirect('/login');
+        }
     }
 }
