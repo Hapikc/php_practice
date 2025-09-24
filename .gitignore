@@ -2,7 +2,3 @@
 /node_modules/
 /.idea/
 /.vscode/
-.htaccess
-/public/.htaccess
-/public/uploads/
-/public/img/
