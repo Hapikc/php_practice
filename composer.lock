@@ -231,22 +231,24 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Hapikc/Middleware.git",
-                "reference": "f5db519401018f39adfe411ef7f7cd8fcda87737"
+                "reference": "864fedbf1bfe9895caf20d32dcb621c70d667c09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Hapikc/Middleware/zipball/f5db519401018f39adfe411ef7f7cd8fcda87737",
-                "reference": "f5db519401018f39adfe411ef7f7cd8fcda87737",
+                "url": "https://api.github.com/repos/Hapikc/Middleware/zipball/864fedbf1bfe9895caf20d32dcb621c70d667c09",
+                "reference": "864fedbf1bfe9895caf20d32dcb621c70d667c09",
                 "shasum": ""
             },
             "require": {
+                "illuminate/database": "^10.48",
+                "illuminate/events": "^10.48",
                 "php": "^8.1"
             },
             "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Hapick\\Middleware\\": "src/"
+                    "Middleware\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -271,7 +273,7 @@
                 "issues": "https://github.com/Hapikc/Middleware/issues",
                 "source": "https://github.com/Hapikc/Middleware/tree/main"
             },
-            "time": "2025-09-22T21:25:09+00:00"
+            "time": "2025-09-24T19:50:02+00:00"
         },
         {
             "name": "hapikc/collect_practice",
@@ -279,12 +281,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Hapikc/collect-php.git",
-                "reference": "53445c12d453b86ddfe5065270164410d1271191"
+                "reference": "69613a2f18b11b6fe3ae95eed6a5de74e850a184"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Hapikc/collect-php/zipball/53445c12d453b86ddfe5065270164410d1271191",
-                "reference": "53445c12d453b86ddfe5065270164410d1271191",
+                "url": "https://api.github.com/repos/Hapikc/collect-php/zipball/69613a2f18b11b6fe3ae95eed6a5de74e850a184",
+                "reference": "69613a2f18b11b6fe3ae95eed6a5de74e850a184",
                 "shasum": ""
             },
             "require": {
@@ -314,7 +316,7 @@
                 "issues": "https://github.com/Hapikc/collect-php/issues",
                 "source": "https://github.com/Hapikc/collect-php/tree/main"
             },
-            "time": "2025-05-14T14:33:04+00:00"
+            "time": "2025-09-24T14:43:02+00:00"
         },
         {
             "name": "illuminate/bus",
